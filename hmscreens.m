@@ -1,7 +1,7 @@
-//
 // Created 22 July 2010 by Hank McShane
-// version 0.1
-// requires Mac OS X 10.4 or higher
+// Modified 2011-2014 by Adam Horner
+// version 0.25
+// requires Mac OS X 10.6 or higher
 //
 // Use hmscreens to either get information about your screens
 // or for setting the main screen (the screen with the menu bar).
@@ -150,13 +150,13 @@ void setMainScreen(NSString* screenID, NSString* othersStartingPosition) {
 			NSString* thisPos = [othersPos objectAtIndex:othersCount];
 			
 			if ([thisPos isEqualToString:@"left"]) {
-				CGConfigureDisplayOrigin(config, activeDisplays[i], -1*CGDisplayPixelsWide(activeDisplays[i]), 0);
+				CGConfigureDisplayOrigin(config, activeDisplays[i], -1*(int)CGDisplayPixelsWide(activeDisplays[i]), 0);
 			} else if ([thisPos isEqualToString:@"right"]) {
-				CGConfigureDisplayOrigin(config, activeDisplays[i], CGDisplayPixelsWide(activeDisplays[newMainScreenIndex]), 0);
+				CGConfigureDisplayOrigin(config, activeDisplays[i], (int)CGDisplayPixelsWide(activeDisplays[newMainScreenIndex]), 0);
 			} else if ([thisPos isEqualToString:@"top"]) {
-				CGConfigureDisplayOrigin(config, activeDisplays[i], 0, -1*CGDisplayPixelsHigh(activeDisplays[i]));
+				CGConfigureDisplayOrigin(config, activeDisplays[i], 0, -1*(int)CGDisplayPixelsHigh(activeDisplays[i]));
 			} else if ([thisPos isEqualToString:@"bottom"]) {
-				CGConfigureDisplayOrigin(config, activeDisplays[i], 0, CGDisplayPixelsHigh(activeDisplays[newMainScreenIndex]));
+				CGConfigureDisplayOrigin(config, activeDisplays[i], 0, (int)CGDisplayPixelsHigh(activeDisplays[newMainScreenIndex]));
 			}
 			othersCount++;
 		}
@@ -186,14 +186,15 @@ void printHelp() {
 	NSString* p = @"\tunder the \"Arrangement\" section of the Displays preference pane.";
 	
 	NSString* q = @"NOTE: Global Position {0, 0} coordinate (as shown under -info)";
-	NSString* r = @"\tis the lower left corner of the main screen";
+	NSString* r = @"\tis the top left corner of the main screen";
 	
 	NSString* z = [NSString stringWithFormat:@"%@\n%@\n\n%@\n%@\n%@\n%@\n%@\n%@\n%@\n\n%@\n%@\n%@\n\n%@\n%@\n%@\n%@\n\n%@\n%@\n",a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r];
-	printf("%s\n", [z UTF8String]);
+	printf("%s", [z UTF8String]);
 }
 
 void displaysInfo() {
 	NSArray* allScreens = [NSScreen screens];
+    CGDirectDisplayID mainScreenID = CGMainDisplayID();
 	
 	int i;
 	for (i=0; i<[allScreens count]; i++) {
@@ -206,39 +207,43 @@ void displaysInfo() {
 		CGDirectDisplayID cgScreenID = (CGDirectDisplayID)[screenID intValue];
 		printf("Screen ID: %i\n", [screenID intValue]);
 		
-		// size
-		NSSize size = [[deviceDescription objectForKey:NSDeviceSize] sizeValue];
-		printf("Size: %s\n", [NSStringFromSize(size) UTF8String]);
-		
-		// global position
-		NSRect frame = [thisScreen frame];
-		int x1 = frame.origin.x;
-		int y1 = frame.origin.y;
-		int x2 = x1 + frame.size.width;
-		int y2 = y1 + frame.size.height;
-		printf("Global Position: {{%i, %i}, {%i, %i}}\n", x1, y1, x2, y2);
-		
+		// size and global position using Core Graphics
+		CGRect displayBounds = CGDisplayBounds(cgScreenID);
+		printf("Display Size: %.0f, %.0f\n", displayBounds.size.width, displayBounds.size.height);
+		printf("Global Position: %.0f, %.0f\n", displayBounds.origin.x, displayBounds.origin.y);
+
 		// color space
 		NSString* colorSpace = [deviceDescription valueForKey:NSDeviceColorSpaceName];
 		printf("Color Space: %s\n", [colorSpace UTF8String]);
-		
+
 		// depth ie. 32 is millions of colors, 16 is thousands, 8 is 256
-		long bpp = CGDisplayBitsPerPixel(cgScreenID);
-		printf("BitsPerPixel: %d\n", bpp);
-		
+		CGDisplayModeRef mode = CGDisplayCopyDisplayMode(cgScreenID);
+		// pixelEncoding has a character for each bit used in the encoding, so the bits per pixel is simply its length
+		CFStringRef pixelEncoding = CGDisplayModeCopyPixelEncoding(mode);
+		//printf("? PixelEncoding: %s\n", [(NSString*)pixelEncoding UTF8String]);
+		printf("Bits Per Pixel: %ld\n", CFStringGetLength(pixelEncoding));
+
+		CFRelease(pixelEncoding);
+
 		// resolution
 		NSSize resolution = [[deviceDescription objectForKey:NSDeviceResolution] sizeValue];
-		printf("Resolution(dpi): %s\n", [NSStringFromSize(resolution) UTF8String]);
-		
+		printf("Resolution(dpi): %.0f, %.0f\n", resolution.width, resolution.height);
+
 		// refresh rate
-		long refresh;
-		CFNumberRef number = CFDictionaryGetValue(CGDisplayCurrentMode(cgScreenID), kCGDisplayRefreshRate); 
-		CFNumberGetValue(number, kCFNumberLongType, &refresh);
-		printf("Refresh Rate: %d\n", refresh);
+		double refresh =CGDisplayModeGetRefreshRate(mode);
+		printf("Refresh Rate: %.0f\n", refresh);
 		
+		//we are now done with the mode, release it
+		CGDisplayModeRelease(mode);
+		
+        if (cgScreenID == mainScreenID) {
+            printf("Main Display: YES\n");
+        } else {
+            printf("Main Display: NO\n");
+        }
+        
 		// usesQuartzExtreme
-		BOOL usesQuartzExtreme = CGDisplayUsesOpenGLAcceleration(cgScreenID);
-		if (usesQuartzExtreme) {
+		if (CGDisplayUsesOpenGLAcceleration(cgScreenID)) {
 			printf("Uses Quartz Extreme: YES\n");
 		} else {
 			printf("Uses Quartz Extreme: NO\n");
