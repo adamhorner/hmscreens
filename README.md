@@ -39,6 +39,13 @@ makes the screen with the Screen ID 69670848 the main screen. Also positions
 other screens to the left of the main screen as shown under the "Arrangement"
 section of the Displays preference pane.
 
+Also see the AppleScript file `screenres.scpt` for an example of how hmscreens
+might be used.
+
+## To Do
+
+- Finish the man page. It was never completed in the original codebase.
+
 ## Changelog
 
 This only gives details of the early changes (before 2014). See the git commits
@@ -46,6 +53,8 @@ for history from 2014 onwards
 
 - Nov 2011 - The screen origin was reset from bottom left to top left to be
   compatible with almost everything else that does screen management on the mac
-- Late 2011 - The code was modified to use CoreGraphics to be compatible with
-  newer versions of OS X (Mountain Lion and Mavericks)
-- Late 2011 - Adam Horner forked the code from the Hamsoft codebase
+- Late 2011 - Adam modified the code to use CoreGraphics to be compatible with
+  newer versions of OS X
+- Aug 2011 - Adam updated the project for Snow Leopard and in doing so,
+  minimally changed some of the output.
+- Mid 2011 - Adam Horner forked the code from the Hamsoft codebase
