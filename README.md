@@ -15,12 +15,12 @@ if you find this code useful, see their page for further details.
 
 ## Usage
 
-- [-h] shows the help text
-- [-info] shows information about the connected screens
-- [-screenIDs] returns only the screen IDs for the connected screens
-- [-setMainID <Screen ID>] Screen ID of the screen that you want to make the
+- `-h` shows the help text
+- `-info` shows information about the connected screens
+- `-screenIDs` returns only the screen IDs for the connected screens
+- `-setMainID <Screen ID>` Screen ID of the screen that you want to make the
   main screen
-- [-othersStartingPosition <position>] left, right, top, or bottom use this with
+- `-othersStartingPosition <position> [left|right|top|bottom]` use this with
   -setMainID to determine placement of other screens
 
 **NOTE**: Global Position `{0,0}` coordinate (as shown with `-info`) is the top
