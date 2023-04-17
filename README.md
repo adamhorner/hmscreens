@@ -8,10 +8,11 @@ The codebase for this project was initially taken directly from [HAMSoft][HS] by
 modifications to this codebase).
 
 [HS]: http://www.hamsoftengineering.com/codeSharing/hmscreens/hmscreens.html
-[AH]: http://www.adamhorner.co.uk/
+[AH]: mailto:software@adam.horner.uk
 
-There is no explicit license on this codebase, Hamsoft just asks for a donation
-if you find this code useful, see their page for further details.
+There is no explicit license on this codebase, Hamsoft used to ask for a donation
+if you find this code useful, their webpage and copy of the code has since been
+removed from their website
 
 ## Usage
 
@@ -24,14 +25,14 @@ if you find this code useful, see their page for further details.
   -setMainID to determine placement of other screens
 
 **NOTE**: Global Position `{0,0}` coordinate (as shown with `-info`) is the top
-left corner of the main screen -- this is different from the main [HAMSoft][HS]
+left corner of the main screen -- this is different from the original [HAMSoft][HS]
 codebase.
 
 ### Examples
 
     hmscreens -info
 
-Returns information about your attached screens including the Screen ID
+Returns information about your attached screens including the Screen IDs
 
     hmscreens -setMainID 69670848 -othersStartingPosition left
 

@@ -1,6 +1,6 @@
 // Created 22 July 2010 by Hank McShane
-// Modified 2011-2014 by Adam Horner
-// version 0.25
+// Modified 2011-2023 by Adam Horner
+// version 0.26
 // requires Mac OS X 10.6 or higher
 //
 // Use hmscreens to either get information about your screens
@@ -29,9 +29,9 @@
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 
-void printHelp();
-void displaysInfo();
-void screenIDs();
+void printHelp(void);
+void displaysInfo(void);
+void screenIDs(void);
 void setMainScreen(NSString* screenID, NSString* othersStartingPosition);
 
 #define MAX_DISPLAYS 32
@@ -69,7 +69,7 @@ int main (int argc, const char * argv[]) {
 #pragma mark -
 #pragma mark FUNCTIONS
 
-void screenIDs() {
+void screenIDs(void) {
 	CGDirectDisplayID activeDisplays[MAX_DISPLAYS];
 	CGDisplayErr err;
 	CGDisplayCount displayCount;
@@ -164,7 +164,7 @@ void setMainScreen(NSString* screenID, NSString* othersStartingPosition) {
 	CGCompleteDisplayConfiguration(config, kCGConfigureForSession);
 }
 
-void printHelp() {
+void printHelp(void) {
 	NSString* a = @"Use hmscreens to either get information about your screens";
 	NSString* b = @"or for setting the main screen (the screen with the menu bar).";
 	
@@ -192,7 +192,7 @@ void printHelp() {
 	printf("%s", [z UTF8String]);
 }
 
-void displaysInfo() {
+void displaysInfo(void) {
 	NSArray* allScreens = [NSScreen screens];
     CGDirectDisplayID mainScreenID = CGMainDisplayID();
 	
@@ -216,14 +216,8 @@ void displaysInfo() {
 		NSString* colorSpace = [deviceDescription valueForKey:NSDeviceColorSpaceName];
 		printf("Color Space: %s\n", [colorSpace UTF8String]);
 
-		// depth ie. 32 is millions of colors, 16 is thousands, 8 is 256
+		// get Display mode for several values
 		CGDisplayModeRef mode = CGDisplayCopyDisplayMode(cgScreenID);
-		// pixelEncoding has a character for each bit used in the encoding, so the bits per pixel is simply its length
-		CFStringRef pixelEncoding = CGDisplayModeCopyPixelEncoding(mode);
-		//printf("? PixelEncoding: %s\n", [(NSString*)pixelEncoding UTF8String]);
-		printf("Bits Per Pixel: %ld\n", CFStringGetLength(pixelEncoding));
-
-		CFRelease(pixelEncoding);
 
 		// resolution
 		NSSize resolution = [[deviceDescription objectForKey:NSDeviceResolution] sizeValue];
