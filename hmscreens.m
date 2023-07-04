@@ -243,6 +243,9 @@ void displaysInfo(void) {
 			printf("Uses Quartz Extreme: NO\n");
 		}
 		
+        // Camera housing height
+        printf("Camera Housing Height: %.0f\n", thisScreen.safeAreaInsets.top);
+
 		printf("\n");
 	}
 }
